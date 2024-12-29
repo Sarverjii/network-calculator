@@ -24,14 +24,14 @@ void createsocketandbind(int port_num){
 
      sockFD = socket(AF_INET,SOCK_STREAM,0);
      if(sockFD<0)
-        error("Error In Making The Socket");
+        error("\033[1;31mError In Making The Socket\033[0m");
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port_num);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     if(bind(sockFD, (struct sockaddr *)&server_addr,sizeof(server_addr)))
-        error("Error While Binding");
+        error("\033[1;31mError While Binding\033[0m");
 
 }
 
@@ -67,7 +67,7 @@ void *AcceptedClientProcessing(void *arg) {
 
       // Get the client's address
     if (getpeername(newsockFD, (struct sockaddr *)&client_addr, &client_len) == -1) {
-        perror("getpeername failed");
+        perror("\033[1;31mgetpeername failed\033[0m");
         return NULL;
     }
 
@@ -75,42 +75,42 @@ void *AcceptedClientProcessing(void *arg) {
 
     while (1) {
         // Send the menu
-        if(writingtoClient(" Network Calculator\n1) Addition\n2) Subtraction\n3) Multiplication\n4) Division\n5) Exit\nEnter your choice: ", newsockFD)==1)
+        if(writingtoClient(" \033[1;37mNetwork Calculator\n1) Addition\n2) Subtraction\n3) Multiplication\n4) Division\n5) Exit\033[1;35m\nEnter your choice: \033[0m", newsockFD)==1)
             break;
 
         // Read the client's choice
         if(readfromClient(newsockFD,&choice)==1)
             break;
         if (choice >= 1 && choice <= 4) {
-            if(writingtoClient("Enter Number 1 : ", newsockFD)==1)
+            if(writingtoClient("\033[1;35mEnter Number 1 : \033[0m", newsockFD)==1)
                 break;
             if(readfromClient(newsockFD,&num1)==1)
                 break;
 
-            if(writingtoClient("Enter Number 2 : ", newsockFD)==1)
+            if(writingtoClient("\033[1;35mEnter Number 2 : \033[0m", newsockFD)==1)
                 break;
             if(readfromClient(newsockFD,&num2)==1)
                 break;
 
             char result[50];
             switch (choice) {
-                case 1: snprintf(result, sizeof(result), "The Result is: %d\n", num1 + num2); break;
-                case 2: snprintf(result, sizeof(result), "The Result is: %d\n", num1 - num2); break;
-                case 3: snprintf(result, sizeof(result), "The Result is: %d\n", num1 * num2); break;
-                case 4: snprintf(result, sizeof(result), "The Result is: %.2f\n", num2 ? (float)num1 / num2 : 0.0); break;
+                case 1: snprintf(result, sizeof(result), "\033[1;33mThe Result is: %d\033[0m\n", num1 + num2); break;
+                case 2: snprintf(result, sizeof(result), "\033[1;33mThe Result is: %d\033[0m\n", num1 - num2); break;
+                case 3: snprintf(result, sizeof(result), "\033[1;33mThe Result is: %d\033[0m\n", num1 * num2); break;
+                case 4: snprintf(result, sizeof(result), "\033[1;33mThe Result is: %.2f\033[0m\n", num2 ? (float)num1 / num2 : 0.0); break;
             }
             if(writingtoClient(result, newsockFD)==1)
                 break;
         } else if (choice == 5) {
-            printf("Client requested to exit\n");
+            printf("\033[1;31mClient requested to exit\033[0m\n");
             break;
         } else {
-            if(writingtoClient("Invalid choice. Try again.\n", newsockFD)==1)
+            if(writingtoClient("\033[1;31mInvalid choice. Try again.\033[0m\n", newsockFD)==1)
                 break;
         }
     }
     exit:close(newsockFD);
-    printf("Client disconnected. IP: %s. [Connected Clients -> %d]\n", inet_ntoa(client_addr.sin_addr), --count);
+    printf("\033[1;31mClient disconnected. IP: %s. [Connected Clients -> %d]\033[0m\n", inet_ntoa(client_addr.sin_addr), --count);
 }
 
 
@@ -121,7 +121,7 @@ void AcceptingClient(){
         socklen_t client_len = sizeof(client_addr);
 
         int newsockfd = accept(sockFD, (struct sockaddr *)&client_addr, &client_len);
-        printf("Client Connected with IP - %s. [Connected Clients -> %d]\n",inet_ntoa(client_addr.sin_addr),++count);
+        printf("\033[1;32mClient Connected with IP - %s. [Connected Clients -> %d]\033[0m\n",inet_ntoa(client_addr.sin_addr),++count);
         pthread_t id;
         pthread_create(&id,NULL,AcceptedClientProcessing,&newsockfd);
     }
@@ -129,7 +129,7 @@ void AcceptingClient(){
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <Port>\n", argv[0]);
+        fprintf(stderr, "\033[1;31mUsage: %s <Port>\033[0m\n", argv[0]);
         exit(1);
     }
 
